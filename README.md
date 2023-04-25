@@ -43,13 +43,4 @@ python3 rtsp_customer.py
 ```
 
 
-## Installation
-
-Install my-project with npm
-
-```bash
-  npm install my-project
-  cd my-project
-```
-
 
