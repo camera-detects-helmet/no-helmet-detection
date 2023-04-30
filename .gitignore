@@ -1,8 +1,9 @@
 venv
-models/*.pt
+models
 .DS_Store
 images/*.png
 images/*.jpg
 images/*.jpeg
 images/*.gif
 images/*.bmp
+.env

@@ -9,8 +9,8 @@ import cv2 as cv
 import os 
 from dotenv import load_dotenv
 from BytesEncoder import BytesEncoder
-
-RTSP_STREAM = "rtsp://localhost:8554/mystream"
+from datetime import datetime
+import argparse
 
 class ObjectDetector(object):
     def __init__(self,source=0,location='TestLocation'):
@@ -71,6 +71,7 @@ class ObjectDetector(object):
                 predictions_no_helmet = detect_helmet.pandas().xyxy[0].values.tolist()
                 lamda_no_helmet = list(filter(lambda x: x[6] == 'no_helmet', predictions_no_helmet))
                 no_helmet = len(lamda_no_helmet)
+                
                 self.num_no_helmet = no_helmet
                 if no_helmet > 0:
                     self.save_status = True
@@ -85,11 +86,12 @@ class ObjectDetector(object):
 
         self.show_frame("RTSP Frame",self.frame,20,10)
         
-        print(f' > 🏍 Rider :  {self.num_rider} , , ⛑ no helmet : , {self.num_no_helmet}' )
+        
+        print(f' {datetime.now().strftime("%H:%M:%S")}> 🏍 Rider :  {self.num_rider} , , ⛑ no helmet : , {self.num_no_helmet}' )
         
         if self.save_status is True:
             self.save_frame(self.frame,crop_rider)  
-            time.sleep(3)          
+            time.sleep(2)          
         
         
                 
@@ -106,7 +108,7 @@ class ObjectDetector(object):
         print(" > 📸 Save Frame : " , filename_mainframe)
         print(" > 📸 Save Frame : " , filename_cropframe)
         self.send_frame(filename_mainframe,filename_cropframe)
-        
+        self.num_no_helmet = 0
         self.save_status = False
         
     
@@ -181,10 +183,43 @@ class ObjectDetector(object):
         if not os.path.exists('images'):
             print(" > 📁 Create Directory images")
             os.mkdir('images')
-        
-if __name__ == '__main__':
+
+
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--rtsp', help='RTSP Stream', default=os.environ.get('RTSP_STREAM'))
+    parser.add_argument('--location', help='Location', default='test_cameras')
+    args = parser.parse_args()
+    return args
+
+def checkArgs(args):
+    print(" > 📁 Location : ",args.location)
+    print(" > 📁 RTSP Stream : ",args.rtsp)
+    if args.rtsp is None:
+        print(" > ❌ RTSP_STREAM is None => export RTSP_STREAM=<rtsp://xxxxx/:xxx/<path>>")
+        return False
+    return True
+
+
+def checkEnvironment():
+    if os.environ.get('API_URL') is None:
+        print(" > ❌ API_URL is None => export API_URL=<http://xxxxx>")
+        return False
     
-    tcamera = ObjectDetector(source=RTSP_STREAM,location='tcamera')
+    return True
+def main():
+    
+    args = parse_args()
+    
+    if checkEnvironment() is False:
+        exit()
+    
+    if checkArgs(args) is False:
+        exit()
+        
+    tcamera = ObjectDetector(source=args.rtsp,location=args.location)
     tcamera.checkDir()    
         
     while True:
@@ -192,6 +227,10 @@ if __name__ == '__main__':
             tcamera.detector_rider()
         except AttributeError:
             pass
+        
+if __name__ == '__main__':
+    
+    main()
     
     
     

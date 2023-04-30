@@ -3,14 +3,14 @@ import cv2 as cv
 import numpy as np
 import time
 import os
+import argparse
 
 
-RTSP_STREAM = "rtsp://localhost:8554/mystream"
 
 class GetVideo:
     
-    def __init__(self,stream):
-        self.stream = stream
+    def __init__(self,rtsp_url):
+        self.stream = rtsp_url
         self.cap = cv.VideoCapture(self.stream)
         self.frame = None
         self.stopped = False
@@ -41,12 +41,15 @@ class GetVideo:
         self.stop()
         
         
-        
-        
-        
-        
-if __name__ == "__main__":
-    video = GetVideo(RTSP_STREAM)
+def parse_opt():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--rtsp', type=str, default='', help='RTSP Stream URL')
+    args = parser.parse_args()
+    return args
+
+def main():
+    args = parse_opt()
+    video = GetVideo(args.rtsp)
     while True:
         frame = video.read()
         if frame is not None:
@@ -59,6 +62,9 @@ if __name__ == "__main__":
             time.sleep(1)
             continue
         
+
+if __name__ == "__main__":    
+    main()
         
     
     
