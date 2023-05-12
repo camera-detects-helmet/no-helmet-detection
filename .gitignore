@@ -1,5 +1,6 @@
 venv
-models
+models/*.pt
+models/new_models/*.pt
 .DS_Store
 images/*.png
 images/*.jpg
@@ -7,3 +8,4 @@ images/*.jpeg
 images/*.gif
 images/*.bmp
 .env
+.mp4
