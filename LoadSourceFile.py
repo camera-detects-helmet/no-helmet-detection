@@ -13,18 +13,22 @@ class LoadSourceFile:
         self.thread = Thread(target=self.update, args=())
         self.thread.daemon = True
         self.thread.start()
-        
+        self.cap.set(3, 1280)
+        self.cap.set(4, 720)
+        self.cap.set(cv.CAP_PROP_AUTOFOCUS, 1) # turn the autofocus off
+        # self.cap.set(28, 255)
         self.cap.set(cv.CAP_PROP_FPS, 60)
         
-        # self.cap.set(28, 255) 
 
-        
-    
-    def config(self, width=640, height=480):
-        self.cap.set(cv.CAP_PROP_FRAME_WIDTH, width)
-        self.cap.set(cv.CAP_PROP_FRAME_HEIGHT, height)
-
-        
+        #get open cv version
+        (major_ver, minor_ver, subminor_ver) = (cv.__version__).split('.')
+        if int(major_ver)  < 3 :
+            self.fps = self.cap.get(cv.cv.CV_CAP_PROP_FPS)
+            print("Frames per second using video.get(cv.cv.CV_CAP_PROP_FPS): {0}".format(self.fps))
+        else :
+            self.fps = self.cap.get(cv.CAP_PROP_FPS)
+            print("Frames per second using video.get(cv.CAP_PROP_FPS) : {0}".format(self.fps)) 
+            
     def update(self):
         while True:
             if self.stopped:
@@ -53,11 +57,6 @@ class LoadSourceFile:
         
     def resize(self, frame, width=640, height=480):
         return cv.resize(frame, (width, height), interpolation=cv.INTER_AREA)
-        
-        
-
-        
-        
-
     
-    
+    def get_fps(self):
+        return self.fps
